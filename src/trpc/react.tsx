@@ -25,7 +25,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
         unstable_httpBatchStreamLink({
           url: getUrl(),
         }),
-      ],
+      ]
     })
   );
 

@@ -21,13 +21,28 @@ const handler = (req: NextRequest) =>
     req,
     router: appRouter,
     createContext: () => createContext(req),
+    responseMeta: (opts) => {
+      const { errors } = opts;
+      if (errors.length) {
+        // propagate http first error from API calls
+        return {
+          status: 500,
+        };
+      }
+      // cache request for 30m + revalidate once every second
+      return {
+        headers: {
+          'cache-control': `s-maxage=1, stale-while-revalidate=1800`,
+        },
+      };
+    },
     onError:
       env.NODE_ENV === "development"
         ? ({ path, error }) => {
-            console.error(
-              `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
-            );
-          }
+          console.error(
+            `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
+          );
+        }
         : undefined,
   });
 
